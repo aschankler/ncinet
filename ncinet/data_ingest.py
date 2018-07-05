@@ -234,7 +234,7 @@ def join_fingerprint_df(nci_df_path, base_df):
     return merged_df.drop('library', axis=1)
 
 
-def load_data_from_tables(df_path, nci_dir, expect_scores=True):
+def load_data_from_tables(df_path, nci_dir, expect_labels=True):
     # type: (str, str, bool) -> MutableMapping[str, np.ndarray]
     """Merges NCI data from DataFrames with topology and stability data from another.
 
@@ -245,14 +245,15 @@ def load_data_from_tables(df_path, nci_dir, expect_scores=True):
         `name`, `dssp`, and possibly `stabilityscore` and `stable?` columns.
     nci_dir: path
         Directory to search for NCI DataFrames.
-    expect_scores: bool
+    expect_labels: bool
         Whether to expect stability scores.
     """
 
     # Load the DataFrame specifying scores and topologies
-    columns = ['name', 'dssp', 'stabilityscore', 'stable?'] if expect_scores else ['name', 'dssp']
+    columns = ['name', 'dssp', 'stabilityscore', 'stable?'] if expect_labels else ['name']
     main_df = pd.read_table(df_path, sep=',', usecols=columns)
-    main_df.loc[:, 'dssp'] = main_df.loc[:, 'dssp'].map(topo_from_dssp)
+    if expect_labels:
+        main_df.loc[:, 'dssp'] = main_df.loc[:, 'dssp'].map(topo_from_dssp)
     main_df = main_df.rename(columns={'dssp': 'topologies', 'stabilityscore': 'scores'})
 
     def canonicalize_name(name):
@@ -286,7 +287,7 @@ def load_data_from_tables(df_path, nci_dir, expect_scores=True):
     nci_data = joined_df.loc[:, nci_labels].values.reshape((-1, 100, 100, 1))
 
     # Extract other data from df
-    output_cols = ['names', 'scores', 'topologies', 'stable?'] if expect_scores else ['names', 'topologies']
+    output_cols = ['names', 'scores', 'topologies', 'stable?'] if expect_labels else ['names']
     output_dict = {c_name: joined_df.loc[:, c_name].values for c_name in output_cols}
     output_dict['fingerprints'] = nci_data
 
@@ -365,12 +366,16 @@ def load_data_from_raws(config):
 def load_prediction_data(config):
     # type: (PredictIngestConfig) -> None
     """Load prediction data from tables and write to archive."""
-    # Load data from raws
-    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir, expect_scores=False)
-    topo_index = read_topo_labels(os.path.join(config.archive_dir, config.topo_index_name))
+    from ncinet.ncinet_input import normalize_prints
 
-    # Apply topo transform
-    predict_data['topologies'] = apply_topo_index(predict_data['topologies'], topo_index)
+    # Load data from raws
+    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir, expect_labels=False)
+
+    # Normalize nci fingerprints
+    with np.load(os.path.join(config.archive_dir, config.norm_data_name)) as norm_f:
+        nci_min, nci_max = norm_f['min'], norm_f['max']
+
+    predict_data['fingerprints'] = normalize_prints(predict_data['fingerprints'], nci_min, nci_max)
 
     # Save archive
     np.savez(os.path.join(config.archive_dir, config.archive_name), **predict_data)

@@ -137,7 +137,7 @@ class PredictIngestConfig(ConfigBase):
         Directory where ingested archive is stored/loaded from.
     nci_dir: path
     dataframe_path: path
-    topo_index_name: str
+    norm_data_name: str
     archive_name: str
         Name of data archive, stored in `archive_dir`.
     batch_size: int
@@ -146,7 +146,7 @@ class PredictIngestConfig(ConfigBase):
     archive_dir = None                      # type: str
     nci_dir = None                          # type: str
     dataframe_path = None                   # type: str
-    topo_index_name = None                  # type: str
+    norm_data_name = None                   # type: str
     archive_name = None                     # type: str
     batch_size = None                       # type: int
 
