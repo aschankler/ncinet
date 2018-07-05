@@ -7,6 +7,7 @@ ingest_config:
   score_path: "<path_to_stability_csv>"
   ingest_version: 'sd2_dataframes_v2'
   topo_index_name: 'topo_index.yml'
+  norm_data_name: 'norm_data.npz'
   archive_prefix: "data"
   tt_tags: !!python/tuple ["train", "eval"]
   xv_tags: !!python/tuple ["xvTrain", "xvVal"]

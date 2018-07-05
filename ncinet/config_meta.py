@@ -98,6 +98,9 @@ class DataIngestConfig(ConfigBase):
     topo_index_name: str
         Filename to save the index which associates topology strings
         with class indices.
+    norm_data_name: str
+        Filename to save archive with per-pixel mins and maxes to use for
+        normalizing nci data.
     archive_prefix: str
         Combined with tags to name archives of data splits.
     tt_tags: Tuple[str, str]
@@ -117,6 +120,7 @@ class DataIngestConfig(ConfigBase):
     score_path = None                       # type: Union[str, Tuple[str, str]]
     ingest_version = None                   # type: str
     topo_index_name = None                  # type: str
+    norm_data_name = None                   # type: str
 
     # parameters for programmatically constructing archive names
     archive_prefix = None                   # type: str
