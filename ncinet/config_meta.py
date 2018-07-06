@@ -137,6 +137,8 @@ class PredictIngestConfig(ConfigBase):
         Directory where ingested archive is stored/loaded from.
     nci_dir: path
     dataframe_path: path
+    dataframe_names: str
+        Name of column in dataframe containing design names.
     norm_data_name: str
     archive_name: str
         Name of data archive, stored in `archive_dir`.
@@ -146,6 +148,7 @@ class PredictIngestConfig(ConfigBase):
     archive_dir = None                      # type: str
     nci_dir = None                          # type: str
     dataframe_path = None                   # type: str
+    dataframe_names = None                  # type: str
     norm_data_name = None                   # type: str
     archive_name = None                     # type: str
     batch_size = None                       # type: int

@@ -234,8 +234,8 @@ def join_fingerprint_df(nci_df_path, base_df):
     return merged_df.drop('library', axis=1)
 
 
-def load_data_from_tables(df_path, nci_dir, expect_labels=True):
-    # type: (str, str, bool) -> MutableMapping[str, np.ndarray]
+def load_data_from_tables(df_path, nci_dir, expect_labels=True, name_col='name'):
+    # type: (str, str, bool, str) -> MutableMapping[str, np.ndarray]
     """Merges NCI data from DataFrames with topology and stability data from another.
 
     Parameters
@@ -246,15 +246,17 @@ def load_data_from_tables(df_path, nci_dir, expect_labels=True):
     nci_dir: path
         Directory to search for NCI DataFrames.
     expect_labels: bool
-        Whether to expect stability scores.
+        Whether to expect stability scores and topo labels.
+    name_col: str
+        Name of column holding the pdb design names.
     """
 
     # Load the DataFrame specifying scores and topologies
-    columns = ['name', 'dssp', 'stabilityscore', 'stable?'] if expect_labels else ['name']
+    columns = [name_col, 'dssp', 'stabilityscore', 'stable?'] if expect_labels else [name_col]
     main_df = pd.read_table(df_path, sep=',', usecols=columns)
     if expect_labels:
         main_df.loc[:, 'dssp'] = main_df.loc[:, 'dssp'].map(topo_from_dssp)
-    main_df = main_df.rename(columns={'dssp': 'topologies', 'stabilityscore': 'scores'})
+    main_df = main_df.rename(columns={'dssp': 'topologies', 'stabilityscore': 'scores', name_col: 'name'})
 
     def canonicalize_name(name):
         """Resolves differences in naming between datasets."""
@@ -369,7 +371,7 @@ def load_prediction_data(config):
     from ncinet.ncinet_input import normalize_prints
 
     # Load data from raws
-    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir, expect_labels=False)
+    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir, expect_labels=False, name_col=config)
 
     # Normalize nci fingerprints
     with np.load(os.path.join(config.archive_dir, config.norm_data_name)) as norm_f:
