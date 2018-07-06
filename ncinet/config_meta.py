@@ -67,9 +67,13 @@ class ModelConfig(ConfigBase):
     label_type: str
         Type of labels to provide during evaluation. Currently one of
         'scores', 'fingerprints', 'topologies'.
+    class_weights: Sequence[float]
+        Class dependent weights for examples when computing the
+        total cross entropy.
     """
     is_autoencoder = None                   # type: bool
     label_type = None                       # type: str
+    class_weights = None                    # type: Sequence[float]
 
 
 @freeze
@@ -94,6 +98,9 @@ class DataIngestConfig(ConfigBase):
     topo_index_name: str
         Filename to save the index which associates topology strings
         with class indices.
+    norm_data_name: str
+        Filename to save archive with per-pixel mins and maxes to use for
+        normalizing nci data.
     archive_prefix: str
         Combined with tags to name archives of data splits.
     tt_tags: Tuple[str, str]
@@ -113,6 +120,7 @@ class DataIngestConfig(ConfigBase):
     score_path = None                       # type: Union[str, Tuple[str, str]]
     ingest_version = None                   # type: str
     topo_index_name = None                  # type: str
+    norm_data_name = None                   # type: str
 
     # parameters for programmatically constructing archive names
     archive_prefix = None                   # type: str
@@ -129,7 +137,7 @@ class PredictIngestConfig(ConfigBase):
         Directory where ingested archive is stored/loaded from.
     nci_dir: path
     dataframe_path: path
-    topo_index_name: str
+    norm_data_name: str
     archive_name: str
         Name of data archive, stored in `archive_dir`.
     batch_size: int
@@ -138,7 +146,7 @@ class PredictIngestConfig(ConfigBase):
     archive_dir = None                      # type: str
     nci_dir = None                          # type: str
     dataframe_path = None                   # type: str
-    topo_index_name = None                  # type: str
+    norm_data_name = None                   # type: str
     archive_name = None                     # type: str
     batch_size = None                       # type: int
 

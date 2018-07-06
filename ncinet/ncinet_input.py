@@ -27,13 +27,17 @@ def load_data_from_archive(archive_path):
     return data
 
 
-def normalize_prints(eval_batch, train_batch):
+def calc_min_max(nci_data):
+    """Calculate the per-pixel min and max of an nci data set"""
+    return nci_data.min(axis=0), nci_data.max(axis=0)
+
+
+def normalize_prints(nci_data, nci_min, nci_max):
     """Performs a min-max norm per-pixel based on training data"""
-    min_a, max_a = train_batch.min(axis=0), train_batch.max(axis=0)
-    dif = max_a - min_a
+    dif = nci_max - nci_min
     dif[dif == 0.] = 1.
 
-    return (eval_batch - min_a) / dif, (train_batch - min_a) / dif
+    return (nci_data - nci_min) / dif
 
 
 def split_train_eval(config, fraction=0.1, topo=None):
@@ -93,9 +97,15 @@ def split_train_eval(config, fraction=0.1, topo=None):
     else:
         raise ValueError("Unexpected value in `score_path`")
 
+    # Calculate normalization parameters
+    nci_min, nci_max = calc_min_max(train_data['fingerprints'])
+
+    # Save normalization information
+    np.savez(os.path.join(config.archive_dir, config.norm_data_name), **{'min': nci_min, 'max': nci_max})
+
     # normalize the fingerprints
-    eval_data['fingerprints'], train_data['fingerprints'] = \
-        normalize_prints(eval_data['fingerprints'], train_data['fingerprints'])
+    train_data['fingerprints'] = normalize_prints(train_data['fingerprints'], nci_min, nci_max)
+    eval_data['fingerprints'] = normalize_prints(eval_data['fingerprints'], nci_min, nci_max)
 
     # save arrays
     np.savez(train_archive_path, **train_data)
