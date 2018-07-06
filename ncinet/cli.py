@@ -121,7 +121,7 @@ def cli():
                 output_path = os.path.join(WORK_DIR, options.output)
             else:
                 assert config.eval_config.eval_dir.endswith('_eval')
-                basename = config.eval_config.eval_dir[:-5]
+                basename = os.path.basename(config.eval_config.eval_dir[:-5])
                 output_path = os.path.join(WORK_DIR, basename+'_serialized')
 
             serialize_model(config, output_path)
