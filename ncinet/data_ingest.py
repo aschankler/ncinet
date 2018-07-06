@@ -371,7 +371,8 @@ def load_prediction_data(config):
     from ncinet.ncinet_input import normalize_prints
 
     # Load data from raws
-    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir, expect_labels=False, name_col=config)
+    predict_data = load_data_from_tables(config.dataframe_path, config.nci_dir,
+                                         expect_labels=False, name_col=config.dataframe_names)
 
     # Normalize nci fingerprints
     with np.load(os.path.join(config.archive_dir, config.norm_data_name)) as norm_f:
