@@ -1,6 +1,6 @@
 # NCInet
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/aschankler/ncinet)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)](https://github.com/aschankler/ncinet)
 [![GitHub tag](https://img.shields.io/github/tag/aschankler/ncinet.svg)](https://github.com/aschankler/ncinet/releases)
 [![license](https://img.shields.io/github/license/aschankler/ncinet.svg)](https://github.com/aschankler/ncinet/blob/master/LICENSE)
 
